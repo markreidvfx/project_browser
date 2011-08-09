@@ -1,0 +1,74 @@
+
+
+About
+-------------------
+
+Project Browser is a Cross-platform file browsing tool designed for use in 
+Visual Effects Production. For more information on how to setup custom Projects
+see the examples in project_browser/projects/
+.
+
+Features
+-------------------
+
+-Simple PyQt interface 
+-Customizable file browsing
+-Thumbnail and file sequence sorting
+-drag and drop support with Foundry Nuke
+
+
+Installing
+-------------------
+
+todo
+
+
+Requirements
+-------------------
+
+Python http://www.python.org/ 2.6 or 2.7 (3.0 and up not supported) 
+PyQt http://www.riverbankcomputing.co.uk/software/pyqt/download
+FFmpeg http://www.ffmpeg.org/ (latest version is best)
+ImageMagick http://www.imagemagick.org/ (latest version is best)
+
+
+License information
+-------------------
+
+see COPYING for more information about the GNU General Public License Version 3
+
+Project Browser also includes Icons from the Tango Desktop Project 
+see below for more information.
+
+Project Browser
+-------------------
+
+Project Browser is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Project Browser is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Project Browser.  If not, see <http://www.gnu.org/licenses/>.
+
+Tango Desktop Project
+-------------------
+
+http://tango.freedesktop.org/Tango_Desktop_Project
+
+
+FFmpeg
+-------------------
+
+http://www.ffmpeg.org
+
+ImageMagick
+-------------------
+
+http://www.imagemagick.org/script/license.php
+
