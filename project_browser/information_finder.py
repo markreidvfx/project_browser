@@ -250,9 +250,7 @@ class Information_Finder_Manager(QObject):
         self.mutex = QMutex()
         self.work_buffer = 2
         
-        worker_count = max(2,cpu_count())
-        
-        worker_count = min(worker_count,4)
+        worker_count = 2
         
         self.max_work = worker_count * 10
         
