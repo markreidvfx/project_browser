@@ -507,8 +507,8 @@ class Content_Treeview(QTreeView):
         
         QTreeView.dataChanged(self,topLeft,bottomRight)
         
-        for i in [1,2,3,4]:
-            self.resizeColumnToContents(i)
+        #for i in [1,2,3,4]:
+            #self.resizeColumnToContents(i)
             
             
     def get_selected_items(self):
