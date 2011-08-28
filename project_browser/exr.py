@@ -257,38 +257,61 @@ def create_channel(item):
     c = Channel(name,data,header)
     
     return c
+
+def box_check(box):
+    
+    
+    new_box = Box(box.min,box.max)
+    
+    for item in [new_box.min,new_box.max]:
+        if item.x is None:
+            item.x = 0
+        if item.y is None:
+            item.y = 0
+            
+    return new_box
+  
+        
+    
+    
+    
+    
               
 
 class ExrImage(object):
     
-    def __init__(self,fileIn):
+    def __init__(self,fileIn=None):
         
-        self.inputFile = OpenEXR.InputFile(fileIn)
-        header = self.inputFile.header()
-        self.header = header
-        
-        
-        self.data_window = Box(header['dataWindow'].min,header['dataWindow'].max)
-        self.display_window = Box(header['displayWindow'].min,header['displayWindow'].max)
+        self.header = None
+        self.data_window = None
+        self.display_window = None
         
         self.channels = {}
         self.layers = {}
         
-        self.readAllChannels()
+        if fileIn:
+            self.read(fileIn)
+        
+        
+        
+        
+        
+    def read(self,fileIn):
+        f = OpenEXR.InputFile(fileIn)
+        header = f.header()
+
+        self.setHeader(header)
+        
+        self.readAllChannels(f)
             
             
-    def readAllChannels(self):
+    def readAllChannels(self,inputFile):
         """Read all Exr channels and load them into channels and layers"""
         channels = self.header['channels'].keys()
         pt = Imath.PixelType(Imath.PixelType.FLOAT)
         
-        data = self.inputFile.channels(channels,pt)
+        data = inputFile.channels(channels,pt)
         
-        header_list = []
-        for i in xrange(len(channels)):
-            header_list.append(dict(self.header))
-            
-            
         for name,chan_data in zip(channels,data):
             
             c = Channel(name,chan_data,dict(self.header))
@@ -324,7 +347,12 @@ class ExrImage(object):
             else:
                 self.layers[name] = [name]
              
-            
+    def setHeader(self,header):
+        
+        self.header = header
+        self.data_window = Box(header['dataWindow'].min,header['dataWindow'].max)
+        self.display_window = Box(header['displayWindow'].min,header['displayWindow'].max)
+        
         
     def width(self):
         return self.display_window.width()
@@ -340,20 +368,18 @@ class ExrImage(object):
         return self.data_window.height()
             
             
-    def save(self,fileOut,channels=None,displayWindow=None,dataWindow=None,half_float=True):
+    def write(self,fileOut,channels=None,displayWindow=None,dataWindow=None,half_float=True):
         
         new_channels = {}
         
         new_header = dict(self.header)
         new_header['channels'] = {}
         
-        roi = dataWindow
-        if not dataWindow:
-            roi = self.data_window
-            #roi = Box(self.header['displayWindow'].min,self.header['displayWindow'].max)
-            #roi  = Box(self.header['dataWindow'].min,self.header['dataWindow'].max)
-            #print roi
-            
+        
+        if dataWindow:
+            roi = box_check(dataWindow)
+        else:
+            roi = box_check(self.data_window)
             
         if not channels:
             channels = self.channels.keys()
@@ -393,7 +419,7 @@ class ExrImage(object):
             for i,name in enumerate(channels):
                 h['channels'][name] = Imath.Channel(Imath.PixelType(OpenEXR.HALF))
                 data_dict[name] = data[i]
-                
+
             out =  OpenEXR.OutputFile(fileOut,h)
     
             out.writePixels(data_dict)
@@ -485,8 +511,8 @@ if __name__ == '__main__':
         
         
     
-    exr1.save(fileIn1 + '_test.exr',channels=['R','G','B','A'])
-    exr2.save(fileIn2 + '_test.exr',channels=['R','G','B','A'])
+    exr1.write(fileIn1 + '_test.exr',channels=['R','G','B','A'])
+    exr2.write(fileIn2 + '_test.exr',channels=['R','G','B','A'])
 
     
     
