@@ -52,7 +52,6 @@ class Scanline(object):
         self.end = end
         self.data = data
         
-        
     def tolist(self):
         return self.data.tolist()
     
@@ -427,7 +426,7 @@ class ExrImage(object):
             
     def getOptimzeRoi(self,channels=None):
         """returns optimal Roi Box object for channels specified 
-        Note: this can be quite slow if you have a large image"""
+        Note: this can be quite slow if you have a large image with alot of channels"""
         
         if not channels:
             channels = self.channels.keys()
@@ -445,7 +444,6 @@ class ExrImage(object):
             for name in channels:
                 chan = self.channels[name]
                 scanline = chan.pixelScanLine(y,box.min.x,box.max.x)
-                
                 first,last = scanline.firstLastPixel()
                 if first.x is None:
                     pass
@@ -461,11 +459,7 @@ class ExrImage(object):
                     else:
                         min_x = min(min_x,first.x)
                         max_x = max(last.x,max_x)
-                        max_y = y
-                        
-                        
-                    break
-                        
+                        max_y = y                      
             
                         
         return Box(Point(min_x,min_y),Point(max_x,max_y))
