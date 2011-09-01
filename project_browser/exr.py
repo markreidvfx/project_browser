@@ -273,8 +273,23 @@ def box_check(box):
         
     
     
+def clamp(value,min_value,max_value):
+    
+    return max(min_value, min(value,max_value))
     
     
+def float_to_8bit(value):
+    return clamp(int(value * 255),0,255)
+
+
+def interleave(*args):
+    for idx in xrange(0, max(len(arg) for arg in args)):
+        for arg in args:
+            try:
+                yield arg[idx]
+            except IndexError:
+                continue
+                 
               
 
 class ExrImage(object):
@@ -365,8 +380,7 @@ class ExrImage(object):
     def dataHeight(self):
         
         return self.data_window.height()
-            
-            
+           
     def write(self,fileOut,channels=None,displayWindow=None,dataWindow=None,half_float=True):
         
         new_channels = {}
@@ -424,6 +438,51 @@ class ExrImage(object):
             out.writePixels(data_dict)
             out.close()
             
+    def writePPM(self,fileOut,channels=None):
+        """write a 8 bit ppm image"""
+        
+        if not channels:
+            channels = ['R','G','B']
+            
+        if isinstance(fileOut, str):
+            f = open(fileOut,'w')
+        else:
+            f = fileOut
+            
+            
+        box = self.display_window
+            
+        f.write('P3\n')
+        f.write('%i %i\n' % (box.width(),box.height()))
+        f.write('255\n')
+        
+        channel_objects = []
+        for name in channels:
+            channel_objects.append(self.channels[name])
+        
+        
+        for y in xrange(box.height()):
+            
+            scanlines = []
+            
+            for chan in channel_objects:
+                scanline = chan.pixelScanLine(y,box.min.x,box.max.x)
+                scanlines.append(scanline)
+            data = []
+            
+            for r,g,b in zip(scanlines[0].data,scanlines[1].data,scanlines[2].data):
+                data.extend([str(float_to_8bit(r)),str(float_to_8bit(g)),str(float_to_8bit(b))])
+                
+            #data = [str(float_to_8bit(p)) for p in interleave(scanlines[0].data,scanlines[1].data,scanlines[2].data)]
+            f.write(' '.join(data) + '\n')
+            del data,scanlines[:]
+            #f.write(' '.join([str(float_to_8bit(p)) for p in data]))
+            #f.write('\n')
+            
+        
+        f.close()
+        
+            
     def getOptimzeRoi(self,channels=None):
         """returns optimal Roi Box object for channels specified 
         Note: this can be quite slow if you have a large image with alot of channels"""
@@ -478,8 +537,15 @@ if __name__ == '__main__':
     start = time.time()
     exr2 = ExrImage(fileIn2)
     print 'File 2',time.time()-start,'secs'
+    start = time.time()
     
+    test_ppm = 'test_files/test.ppm'
+   #test_ppm = StringIO()
+    exr2.writePPM(test_ppm)
+    print 'wrote PPM in',time.time()-start,'secs'
     
+    #raise Exception()
+
     print exr1.channels['R'].pixelAt(1000,570)
     print exr2.channels['R'].pixelAt(1000,570)
     
@@ -487,6 +553,9 @@ if __name__ == '__main__':
     print len(exr1.channels['R'].pixelScanLine(570,1000,1919).tolist())
     print len(exr1.channels['R'].pixelScanLine(570,0,1000).tolist())
     print len(exr1.channels['R'].pixelScanLine(570,0,200).tolist())
+    
+    
+    
     print 'testing roi'
     #for layer in ['RGBA']:
         #print layer,exr1.data_window,exr2.getOptimzeRoi2(exr2.layers[layer].keys()),exr2.getOptimzeRoi(exr2.layers[layer].keys())
@@ -504,9 +573,12 @@ if __name__ == '__main__':
     print roi,time.time()-start,'secs'
         
         
-    
+    start = time.time()
     exr1.write(fileIn1 + '_test.exr',channels=['R','G','B','A'])
+    print 'exr2 wrote in',time.time()-start,'secs'
+    start = time.time()
     exr2.write(fileIn2 + '_test.exr',channels=['R','G','B','A'])
+    print 'exr2 wrote in',time.time()-start,'secs'
 
     
     
