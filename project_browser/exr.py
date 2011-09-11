@@ -95,7 +95,7 @@ class Scanline(object):
         
         first = self.firstPixel()
         last = Point(None,None)
-        if first.x:
+        if not first.x is None:
             last = self.lastPixel()
             
             
@@ -581,4 +581,4 @@ if __name__ == '__main__':
     print 'exr2 wrote in',time.time()-start,'secs'
 
     
-    
+  
